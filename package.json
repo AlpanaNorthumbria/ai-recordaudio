@@ -20,7 +20,9 @@
     "firebase": "^9.6.11",
     "music-metadata-browser": "^2.5.8",
     "react": "18.0.0",
-    "react-native": "0.69.4"
+    "react-native": "0.69.4",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
+    "react-native-root-toast": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
