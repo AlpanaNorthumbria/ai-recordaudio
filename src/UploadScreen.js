@@ -3,6 +3,8 @@ import { Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Image, B
 import React, { useState } from 'react';
 import { Audio } from 'expo-av';
 import { firebase } from '../config';
+import { getStorage, ref, updateMetadata } from "firebase/storage";
+
 
 const UploadScreen = () => {
     const [recording, setRecording] = React.useState();
@@ -62,9 +64,9 @@ const UploadScreen = () => {
             <View key={index} style={styles.row}>
               <Text style={styles.fill}>Recording {index + 1} - {recordingLine.duration}</Text>
               <Button style={styles.buttonPlay} onPress={() => recordingLine.sound.replayAsync()} title="Play"></Button>
-              <TouchableOpacity style={styles.buttonUpload} onPress={uploadAudio} >
+              <TouchableOpacity style={styles.buttonUpload} onPress={uploadAudio(index)} >
                     <Text style={styles.buttonText}>
-                        Upload
+                        Send
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -91,9 +93,9 @@ const UploadScreen = () => {
     //     setImage(null);
     // };
 
-    const uploadAudio = async () => {
-        console.log('URI:', recordings[0].file)
-        const uri = recordings[0].file;
+    const uploadAudio = async (index) => {
+        console.log('URI:', recordings[index].file)
+        const uri = recordings[index].file;
        // const uri = await fetch(recordings.uri)
         try {
           const blob = await new Promise((resolve, reject) => {
@@ -115,15 +117,26 @@ const UploadScreen = () => {
           });
           if (blob != null) {
             const uriParts = uri.split(".");
+            const uriPathParts = uri.split("/");
+
+            const fileName = uriPathParts[uriPathParts.length - 1];
             const fileType = uriParts[uriParts.length - 1];
-            firebase
+            const metadata = {
+              customMetadata: {
+                'name' : 'Alpana',
+                'location': 'Yosemite, CA, USA',
+                'DateTime': getStorage.DateTime
+              }
+            };
+
+            const getRef = firebase
               .storage()
               .ref()
-              .child(`nameOfTheFile.${fileType}`)
+              .child(`${fileName}`)
               .put(blob, {
                 contentType: `audio/${fileType}`,
               })
-              .then(() => {
+              .then (()=> {
                 console.log("Sent!");
               })
               .catch((e) => console.log("error:", e));
