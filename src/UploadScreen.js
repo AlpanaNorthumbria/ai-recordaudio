@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Image, Button } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Image, Button, TextInput } from 'react-native';
 import React, { useState } from 'react';
 import { Audio } from 'expo-av';
 import { firebase } from '../config';
@@ -11,6 +11,7 @@ const UploadScreen = () => {
     const [recordings, setRecordings] = React.useState([]);
     const [message, setMessage] = React.useState("");
     const [uploading, setuploading] = useState(false);
+    const [text, onChangeText] = React.useState(null);
 
     async function startRecording() {
         try {
@@ -64,7 +65,8 @@ const UploadScreen = () => {
             <View key={index} style={styles.row}>
               <Text style={styles.recordingDuration}>Recording {index + 1} - {recordingLine.duration}</Text>
               <Button style={styles.buttonPlay} onPress={() => recordingLine.sound.replayAsync()} title="Play"></Button>
-              <TouchableOpacity style={styles.buttonUpload} onPress={() => uploadAudio(index)} >
+              <TextInput style={styles.input} onChangeText={onChangeText} value={text}/>
+              <TouchableOpacity style={styles.buttonUpload} onPress={() => uploadAudio(index, text)} >
                     <Text style={styles.buttonText}>
                         Send
                     </Text>
@@ -74,7 +76,7 @@ const UploadScreen = () => {
         });
       }
 
-    const uploadAudio = async (index) => {
+    const uploadAudio = async (index, text) => {
        // console.log('URI:', recordings[0].file)
         const uri =await recordings[index].file;
        // const uri = await fetch(recordings.uri)
@@ -99,13 +101,14 @@ const UploadScreen = () => {
           if (blob != null) {
             const uriParts = uri.split(".");
             const uriPathParts = uri.split("/");
+            const name = text;
 
             const fileName = uriPathParts[uriPathParts.length - 1];
             const fileType = uriParts[uriParts.length - 1];
             firebase
               .storage()
               .ref()
-              .child(`${fileName}.${fileType}`)
+              .child(`${name}.${fileName}.${fileType}`)
               .put(blob, {
                 contentType: `audio/${fileType}`,
               })
@@ -195,7 +198,12 @@ const styles = StyleSheet.create({
         fontSize:12,
         marginTop: 20,
         marginBottom:10
+    },
+    input: {
+        height: 40,
+        marginTop:10,
+        borderWidth: 2,
+        padding: 10,
     }
-
 })
 
