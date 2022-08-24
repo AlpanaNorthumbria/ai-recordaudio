@@ -22,13 +22,17 @@
       "infoPlist": {
         "UIBackgroundModes": [
         ]
-      }
+      },
+      "bundleIdentifier": "com.northumbria.ai-recordaudio",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.northumbria.ai-recordaudio",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"

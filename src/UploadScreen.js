@@ -1,16 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import { Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Image, Button } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Image, Button, TextInput } from 'react-native';
 import React, { useState } from 'react';
 import { Audio } from 'expo-av';
 import { firebase } from '../config';
-import { getStorage, ref, updateMetadata } from "firebase/storage";
 
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import Toast from 'react-native-root-toast';
 
 const UploadScreen = () => {
     const [recording, setRecording] = React.useState();
     const [recordings, setRecordings] = React.useState([]);
     const [message, setMessage] = React.useState("");
     const [uploading, setuploading] = useState(false);
+    const [text, onChangeText] = React.useState(null);
 
     async function startRecording() {
         try {
@@ -62,9 +64,11 @@ const UploadScreen = () => {
         return recordings.map((recordingLine, index) => {
           return (
             <View key={index} style={styles.row}>
-              <Text style={styles.fill}>Recording {index + 1} - {recordingLine.duration}</Text>
+              <Text style={styles.recordingDuration}>Recording {index + 1} - {recordingLine.duration}</Text>
               <Button style={styles.buttonPlay} onPress={() => recordingLine.sound.replayAsync()} title="Play"></Button>
-              <TouchableOpacity style={styles.buttonUpload} onPress={uploadAudio(index)} >
+
+              <TextInput style={styles.input} onChangeText={onChangeText} value={text}/>
+              <TouchableOpacity style={styles.buttonUpload} onPress={() => uploadAudio(index, text)} >
                     <Text style={styles.buttonText}>
                         Send
                     </Text>
@@ -74,28 +78,10 @@ const UploadScreen = () => {
         });
       }
 
-    // const uploadAudio = async () => {
-    //     setuploading(true);
-    //     const response = await fetch(image.uri)
-    //     const blob = await response.blob();
-    //     const filename = image.uri.substring(image.uri.lastIndexOf('/')+1);
-    //     var ref = firebase.storage().ref().child(filename).put(blob);
 
-    //     try {
-    //         await ref;
-    //     } catch (e) {
-    //         console.log(e);
-    //     }
-    //     setuploading(false);
-    //     Alert.alert(
-    //         'Photo Uploaded..!!'
-    //     );
-    //     setImage(null);
-    // };
-
-    const uploadAudio = async (index) => {
-        console.log('URI:', recordings[index].file)
-        const uri = recordings[index].file;
+    const uploadAudio = async (index, text) => {
+       // console.log('URI:', recordings[0].file)
+        const uri =await recordings[index].file;
        // const uri = await fetch(recordings.uri)
         try {
           const blob = await new Promise((resolve, reject) => {
@@ -119,6 +105,7 @@ const UploadScreen = () => {
             const uriParts = uri.split(".");
             const uriPathParts = uri.split("/");
 
+            const name = text;
             const fileName = uriPathParts[uriPathParts.length - 1];
             const fileType = uriParts[uriParts.length - 1];
             //alpana changes -- adding metadata for each audio with patient details
@@ -133,12 +120,18 @@ const UploadScreen = () => {
             const getRef = firebase
               .storage()
               .ref()
-              .child(`${fileName}`)
+
+              .child(`${name}.${fileName}.${fileType}`)
               .put(blob, {
                 contentType: `audio/${fileType}`,
               })
-              .then (()=> {
-                console.log("Sent!");
+              .then(() => {
+                // Alert.alert(
+                //     'Recording Uploaded..!!'
+                // );
+                Toast.show('Recording Uploaded..!!', {
+                    duration: Toast.durations.LONG,
+                  });
               })
               .catch((e) => console.log("error:", e));
           } else {
@@ -150,13 +143,17 @@ const UploadScreen = () => {
     };
 
     return (
-       <SafeAreaView style={styles.container}>
-            <Text>{message}</Text>
-            <Button
-                title={recording ? 'Stop Recording' : 'Start Recording'}
-                onPress={recording ? stopRecording : startRecording} />
-            {getRecordingLines()}
-            <StatusBar style="auto" />
+        <SafeAreaView style={styles.container}>
+            <KeyboardAwareScrollView
+                style={{ flex: 1, width: '80%' }}
+                keyboardShouldPersistTaps="always">
+                <Text>{message}</Text>
+                <Button
+                    title={recording ? 'Stop Recording' : 'Start Recording'}
+                    onPress={recording ? stopRecording : startRecording} />
+                {getRecordingLines()}
+                <StatusBar style="auto" />
+            </KeyboardAwareScrollView>
         </SafeAreaView>
     )
 }
@@ -165,10 +162,11 @@ export default UploadScreen
 
 const styles = StyleSheet.create({
     container:{
-        flex:1,
+        flex:2,
         alignItems:'center',
         backgroundColor:'#fff',
-        justifyContent:'center'
+        justifyContent:'center',
+        marginTop:100
     },
     selectButton: {
         borderRadius:5,
@@ -195,7 +193,7 @@ const styles = StyleSheet.create({
     buttonUpload: {
         fontSize:18,
         fontWeight:'bold',
-        marginTop: 20,
+        marginTop: 10,
         borderRadius:5,
         width:150,
         height:50,
@@ -208,7 +206,17 @@ const styles = StyleSheet.create({
         color:'white',
         fontSize:18,
         fontWeight:'bold'
+    },
+    recordingDuration: {
+        fontSize:12,
+        marginTop: 20,
+        marginBottom:10
+    },
+    input: {
+        height: 40,
+        marginTop:10,
+        borderWidth: 2,
+        padding: 10,
     }
-
 })
 
