@@ -109,13 +109,13 @@ const UploadScreen = () => {
             const fileName = uriPathParts[uriPathParts.length - 1];
             const fileType = uriParts[uriParts.length - 1];
             //alpana changes -- adding metadata for each audio with patient details
-            const metadata = {
+            /*const metadata = {
               customMetadata: {
                 'name' : 'Alpana',
                 'location': 'Yosemite, CA, USA',
                 'DateTime': getStorage.DateTime
               }
-            };
+            };*/
             //ends
             const getRef = firebase
               .storage()
