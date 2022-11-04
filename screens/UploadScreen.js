@@ -2,11 +2,16 @@ import { StatusBar } from 'expo-status-bar';
 import { Text, View, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Image, Button, TextInput } from 'react-native';
 import React, { useState } from 'react';
 import { Audio } from 'expo-av';
-import { firebase } from '../config';
+import { firebase } from '../config/firebase';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Toast from 'react-native-root-toast';
+// import { Button } from 'react-native-elements';
+import { getAuth, signOut } from 'firebase/auth';
+import { useAuthentication } from '../hook/useAuthentication';
 
 const UploadScreen = () => {
+    const auth = getAuth();
+
     const [recording, setRecording] = React.useState();
     const [recordings, setRecordings] = React.useState([]);
     const [message, setMessage] = React.useState("");
@@ -129,11 +134,15 @@ const UploadScreen = () => {
         }
     };
 
+    const { user } = useAuthentication();
+
     return (
         <SafeAreaView style={styles.container}>
             <KeyboardAwareScrollView
                 style={{ flex: 1, width: '80%' }}
                 keyboardShouldPersistTaps="always">
+                <Text>Welcome {user?.email}!</Text>
+                <Button title="Sign Out" style={{marginTop:10}} onPress={() => signOut(auth)} />  
                 <Text>{message}</Text>
                 <Button
                     title={recording ? 'Stop Recording' : 'Start Recording'}
