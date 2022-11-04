@@ -32,7 +32,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.northumbria.ai-recordaudio",
+      "package": "com.northumbria.airecordaudio",
       "versionCode": 1
     },
     "web": {
