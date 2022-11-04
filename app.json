@@ -22,9 +22,10 @@
       "infoPlist": {
         "UIBackgroundModes": [
           "audio"
-        ]
+        ],
+        "NSAppleMusicUsageDescription": "Allow $(PRODUCT_NAME) to access your music library"
       },
-      "bundleIdentifier": "com.northumbria.ai-recordaudio",
+      "bundleIdentifier": "com.northumbria.airecordaudio",
       "buildNumber": "1.0.0"
     },
     "android": {
@@ -32,7 +33,11 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
+<<<<<<< HEAD
       "package": "com.northumbria.airecordaudio",
+=======
+      "package": "com.northumbria.ai_recordaudio",
+>>>>>>> cf3f9bb9e30bb4252961eccea8d2adc41be231b9
       "versionCode": 1
     },
     "web": {
@@ -40,6 +45,11 @@
     },
     "plugins": [
       "expo-music-picker"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6168c50b-4c90-495d-8ae2-6f65e2740f40"
+      }
+    }
   }
 }
